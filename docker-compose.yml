@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        ENV_PATH: ${ENV_PATH:-.env}
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             gunicorn -k uvicorn.workers.UvicornWorker Auth_Template.asgi:application --bind 0.0.0.0:8000 --workers 20 --threads 10 --worker-connections 1000"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      ENV_PATH: ${ENV_PATH:-.env}
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+    networks:
+      - auth_network
+
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A Auth_Template worker --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      - DJANGO_SETTINGS_MODULE=Auth_Template.settings
+    env_file: 
+      - ${ENV_FILE:-.env}
+    depends_on:
+      - web
+      - redis
+      - postgres
+    restart: always
+    networks:
+      - auth_network
+
+  redis:
+    image: redis:7.4
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - auth_network
+
+  postgres:
+    image: postgres:17.3
+    volumes:
+      - auth_template_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-django_db}
+      - POSTGRES_USER=${POSTGRES_USER:-django_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-django_password0628!}
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - auth_network
+
+networks:
+  auth_network:
+    driver: bridge
+
+volumes:
+  auth_template_data:

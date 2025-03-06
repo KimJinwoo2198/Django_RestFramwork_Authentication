@@ -1,0 +1,48 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+<title>AutoMSG | Email Verification</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light min-vh-100 d-flex align-items-center">
+  <div class="container">
+      <div class="row justify-content-center">
+          <div class="col-lg-9">
+              <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
+                  <div class="row g-0">
+                      <div class="col-lg-6 bg-primary text-white d-flex align-items-center justify-content-center p-4 p-lg-5">
+                          <div class="text-center">
+                              <i class="fas fa-shield-alt fa-5x mb-4"></i>
+                              <h2 class="fw-bold mb-3">안전한 인증</h2>
+                              <p class="lead mb-3">귀하의 계정 보안을 위해<br>이메일로 전송된 인증 코드를<br>입력해주세요.</p>
+                              <p class="small mb-0">본 인증 과정은 귀하의 개인정보를<br>안전하게 보호하기 위한 절차입니다.</p>
+                          </div>
+                      </div>
+                      <div class="col-lg-6 d-flex flex-column justify-content-center p-4 p-lg-5">
+                          <h3 class="fw-bold mb-4 text-center">인증 코드 확인</h3>
+                          <form method="post">
+                              {% csrf_token %}
+                              <div class="form-floating mb-4">
+                                  <input type="text" class="form-control" id="verificationCode" name="verification_code" placeholder="인증 코드" required maxlength="6" autocomplete="off">
+                                  <label for="verificationCode">6자리 인증 코드</label>
+                              </div>
+                              <div class="d-grid gap-2">
+                                  <button type="submit" class="btn btn-primary">
+                                      <i class="fas fa-check-circle me-2"></i>확인
+                                  </button>
+                              </div>
+                          </form>
+                          <div class="mt-4 text-center">
+                              <small class="text-muted">문제가 있으신가요? <br><a href="#" class="text-decoration-none">고객 지원 센터 문의</a></small>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+{% endblock %}
